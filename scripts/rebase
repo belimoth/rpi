@@ -1,0 +1,8 @@
+git checkout --detach
+git branch --force master $( git rev-list --max-parents=0 HEAD )
+git reset --soft master
+git checkout master
+
+git add .
+git commit --message "" --allow-empty-message
+git push --force

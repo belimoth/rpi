@@ -1,0 +1,8 @@
+git init
+git remote add origin https://github.com/belimoth/rpi.git
+git fetch
+git reset --hard origin/master
+
+chmod +x ~/bin/*
+
+source ~/.bashrc

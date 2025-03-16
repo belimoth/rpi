@@ -1,0 +1,94 @@
+#!/bin/bash
+
+clear
+echo "installing..."
+
+#
+
+sudo raspi-config nonint do_boot_behaviour B2
+sudo raspi-config nonint do_boot_splash    1
+
+#
+
+# [[ -d /etc/pod ]] && exit
+
+sudo mkdir --parents /etc/pod
+sudo mkdir --parents /usr/share/X11/xorg.conf.d
+
+#
+
+sudo cp ~/pod/files/tft9341-overlay.dtb /boot/overlays/tft9341-overlay.dtb
+sudo cp ~/pod/files/tft9341-overlay.dtb /boot/overlays/tft9341.dtbo
+
+#
+
+sudo cp ~/pod/files/argonpodd.py /etc/pod/argonpodd.py
+
+#
+
+sudo touch /etc/pod.conf
+
+#
+
+sudo cp ~/pod/files/argonpodd.service    /lib/systemd/system/argonpodd.service
+sudo cp ~/pod/files/argonpod-shutdown.sh /lib/systemd/system-shutdown/argonpod-shutdown.sh
+
+#
+
+sudo cp ~/pod/files/99-calibration.conf /usr/share/X11/xorg.conf.d/99-calibration.conf
+sudo cp ~/pod/files/99-fbturbo.conf     /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+
+#
+
+sudo chmod 755 /etc/pod/*
+
+sudo chmod 755 /boot/overlays/tft9341-overlay.dtb
+sudo chmod 755 /boot/overlays/tft9341.dtbo
+
+sudo chmod 644 /usr/share/X11/xorg.conf.d/99-calibration.conf
+sudo chmod 644 /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+
+sudo chmod 644 /lib/systemd/system/argonpodd.service
+sudo chmod 755 /lib/systemd/system-shutdown/argonpod-shutdown.sh
+
+sudo chmod 666 /etc/pod.conf
+
+
+#
+
+# cat ~/pod/config.txt | sudo tee --append /boot/firmware/config.txt > /dev/null
+cat ~/pod/config.txt | sudo tee --append /boot/config.txt > /dev/null
+
+#
+
+sudo apt-get --yes --quiet install xserver-xorg-input-evdev
+
+sudo cp /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
+
+#
+
+# grep -q -F "fbcon" /boot/firmware/cmdline.txt && echo "$(cat /boot/firmware/cmdline.txt) fbcon=map:10 fbcon=font:ProFont6x11 " | sudo tee /boot/firmware/cmdline.txt > /dev/null
+grep -q -F "fbcon" /boot/cmdline.txt && echo "$(cat /boot/cmdline.txt) fbcon=map:10 fbcon=font:ProFont6x11 " | sudo tee /boot/cmdline.txt > /dev/null
+
+#
+
+# sudo apt-get install --yes --quiet raspi-gpio
+sudo apt-get install --yes --quiet python3-rpi.gpio
+# sudo apt-get install --yes --quiet python3-libgpiod
+
+#
+
+sudo apt-get --yes --quiet install cmake
+
+#
+
+sudo systemctl daemon-reload
+sudo systemctl enable argonpodd.service
+sudo systemctl start argonpodd.service
+
+# NOTE restart command
+# sudo systemctl restart argonpodd.service
+
+#
+
+echo "installation complete; reboot for changes to take effect"

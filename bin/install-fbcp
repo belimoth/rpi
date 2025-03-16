@@ -1,0 +1,42 @@
+#!/bin/bash
+
+[[ -x $( command -v cmake ) ]] || { echo "error: cmake required"; exit 1; }
+
+echo "installing fbcp..."
+
+#
+
+[[ -d /etc/pod/rpi-fbcp ]] && sudo rm -rf /etc/pod/rpi-fbcp
+
+sudo mkdir --parents       /etc/pod/rpi-fbcp/build
+sudo chmod --recursive 755 /etc/pod/rpi-fbcp/build
+
+# License Agreement
+sudo wget https://download.argon40.com/pod/rpi-fbcp/LICENSE   -O /etc/pod/rpi-fbcp/LICENSE   --quiet
+sudo wget https://download.argon40.com/pod/rpi-fbcp/README.md -O /etc/pod/rpi-fbcp/README.md --quiet
+
+# Source code/make file
+sudo wget https://download.argon40.com/pod/rpi-fbcp/main.c         -O /etc/pod/rpi-fbcp/main.c        --quiet
+sudo wget https://download.argon40.com/pod/rpi-fbcp/CMakeLists.txt -O /etc/pod/rpi-fbcp/CMakeLists.txt --quiet
+
+#
+
+pushd /etc/pod/rpi-fbcp/build
+sudo cmake ..
+sudo make
+sudo install fbcp /usr/local/bin/fbcp
+popd
+
+#
+
+sudo cp ~/pod/99-fbturbo.conf /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+sudo chmod 644                /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+
+#
+
+cat /etc/rc.local | sudo grep -v "exit " > /etc/rc.local
+echo "sleep 7"    | sudo tee --append      /etc/rc.local
+echo "fbcp &"     | sudo tee --append      /etc/rc.local
+echo "exit 0"     | sudo tee --append      /etc/rc.local
+
+echo "installation complete; reboot for changes to take effect"

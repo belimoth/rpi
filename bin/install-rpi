@@ -1,0 +1,28 @@
+#!/bin/bash
+
+clear
+echo "installing..."
+
+#
+
+sudo raspi-config nonint do_boot_behaviour B2
+sudo raspi-config nonint do_boot_splash    1
+
+#
+
+touch ~/.hushlogin
+sudo truncate -s 0 /etc/motd
+
+#
+
+[[ -x $( command -v startx ) ]] || {
+	sudo apt-get --yes --quiet install git
+	sudo apt-get --yes --quiet install rpi-imager
+}
+
+#
+
+[[ $( tail --lines 1 /boot/firmware/config.txt ) == "[all]" ]] || exit
+
+echo "boot_delay=0"     | sudo tee --append /boot/firmware/config.txt
+echo "disable_splash=1" | sudo tee --append /boot/firmware/config.txt

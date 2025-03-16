@@ -1,0 +1,10 @@
+[Unit]
+Description=Argon Pod
+After=multi-user.target
+[Service]
+Type=simple
+Restart=always
+RemainAfterExit=true
+ExecStart=/usr/bin/python3 /etc/pod/argonpodd.py SERVICE
+[Install]
+WantedBy=multi-user.target

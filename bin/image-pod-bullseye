@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo "imaging..."
+
+#
+
+# osi=raspios_lite_arm64
+osi=raspios_oldstable_arm64
+
+dev=/dev/sda
+
+#
+
+url=$( curl --location --silent --head --write-out '%{url_effective}\n' --output /dev/null https://downloads.raspberrypi.org/${osi}_latest )
+img=$( basename $url )
+
+#
+
+[[ -f $img ]] || curl --output $img $url
+
+#
+
+sudo rpi-imager --cli $img $dev
