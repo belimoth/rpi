@@ -1,0 +1,3 @@
+sleep 7
+fbcp &
+exit 0

@@ -3,26 +3,28 @@
 clear
 echo "installing..."
 
+[[ $( id -u ) == 0 ]] || { echo "error: please run as root"; exit 1; }
+
 #
 
-sudo raspi-config nonint do_boot_behaviour B2
-sudo raspi-config nonint do_boot_splash    1
+raspi-config nonint do_boot_behaviour B2
+raspi-config nonint do_boot_splash    1
 
 #
 
 touch ~/.hushlogin
-sudo truncate -s 0 /etc/motd
-
-#
-
-[[ -x $( command -v startx ) ]] || {
-	sudo apt-get --yes --quiet install git
-	sudo apt-get --yes --quiet install rpi-imager
-}
+truncate -s 0 /etc/motd
 
 #
 
 [[ $( tail --lines 1 /boot/firmware/config.txt ) == "[all]" ]] || exit
 
-echo "boot_delay=0"     | sudo tee --append /boot/firmware/config.txt
-echo "disable_splash=1" | sudo tee --append /boot/firmware/config.txt
+echo "boot_delay=0"     | tee --append /boot/firmware/config.txt
+echo "disable_splash=1" | tee --append /boot/firmware/config.txt
+
+#
+
+[[ -x $( command -v startx ) ]] || {
+	apt-get --quiet --yes install git
+	apt-get --quiet --yes install rpi-imager
+}

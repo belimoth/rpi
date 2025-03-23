@@ -1,3 +1,5 @@
+[[ -x $( command -v git ) ]] || sudo apt-get --quiet --yes install git
+
 git init
 git remote add origin https://github.com/belimoth/rpi.git
 git fetch

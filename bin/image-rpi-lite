@@ -7,13 +7,13 @@ echo "imaging..."
 
 #
 
-osi=raspios_oldstable_arm64
+osi=raspios_lite_arm64
 
 dev=/dev/sda
 
 #
 
-url=$( curl --location --silent --head --write-out '%{url_effective}\n' --output /dev/null https://downloads.raspberrypi.org/${osi}_latest )
+url=$( curl --head --location --silent --write-out '%{url_effective}\n' --output /dev/null https://downloads.raspberrypi.org/${osi}_latest )
 img=$( basename $url )
 
 #

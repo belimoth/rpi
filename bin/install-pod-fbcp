@@ -1,0 +1,40 @@
+#!/bin/bash
+
+clear
+echo "installing fbcp..."
+
+[[ $( id -u ) == 0 ]] || { echo "error: please run as root"; exit 1; }
+
+[[ -x $( command -v cmake ) ]] || { echo "error: cmake required"; exit 1; }
+
+#
+
+[[ -d /etc/pod/fbcp ]] && rm -rf /etc/pod/fbcp
+
+mkdir --parents       /etc/pod/fbcp/build
+chmod --recursive 755 /etc/pod/fbcp/build
+
+cp ~/pod/files/fbcp/main.cp        /etc/pod/fbcp/main.c
+cp ~/pod/files/fbcp/CMakeLists.txt /etc/pod/fbcp/CMakeLists.txt
+
+#
+
+pushd /etc/pod/fbcp/build
+cmake ..
+make
+install fbcp /usr/local/bin/fbcp
+popd
+
+#
+
+cp ~/pod/fbcp/99-fbturbo.conf /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+chmod 644                     /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+
+#
+
+cat /etc/rc.local       | grep -v "exit " > /etc/rc.local
+cat ~/pod/fbcp/rc.local | tee --append      /etc/rc.local
+
+#
+
+echo "installation complete; reboot for changes to take effect"
